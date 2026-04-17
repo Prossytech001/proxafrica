@@ -11,6 +11,7 @@ import {
   TouchableWithoutFeedback,
 } from 'react-native';
 import { colors, spacing } from '../theme';
+import { Linking } from 'react-native';
 
 const { width: SCREEN_W } = Dimensions.get('window');
 const IS_SMALL = SCREEN_W < 600;
@@ -96,9 +97,13 @@ export default function NavBar({ scrollRef, sectionRefs }) {
 
         {/* Desktop CTA button */}
         {!IS_SMALL && (
-          <TouchableOpacity style={styles.ctaBtn} activeOpacity={0.8}>
-            <Text style={styles.ctaBtnText}>Get In Touch</Text>
-          </TouchableOpacity>
+          <TouchableOpacity
+             style={styles.ctaBtn} 
+             activeOpacity={0.8}
+             onPress={() => Linking.openURL('https://wa.me/message/BFK5N4OMHUXXG1')}
+           >
+            <Text style={styles.ctaBtnText}>Get In Touch ↗</Text>
+           </TouchableOpacity>
         )}
 
         {/* Mobile hamburger */}
@@ -160,9 +165,13 @@ export default function NavBar({ scrollRef, sectionRefs }) {
             <View style={styles.divider} />
 
             {/* CTA */}
-            <TouchableOpacity style={styles.drawerCta} activeOpacity={0.8}>
-              <Text style={styles.drawerCtaText}>Get In Touch ↗</Text>
-            </TouchableOpacity>
+           <TouchableOpacity
+             style={styles.drawerCta}
+             activeOpacity={0.8}
+             onPress={() => Linking.openURL('https://wa.me/message/BFK5N4OMHUXXG1')}
+           >
+            <Text style={styles.drawerCtaText}>Get In Touch ↗</Text>
+           </TouchableOpacity>
 
             {/* Brand tagline at bottom */}
             <Text style={styles.drawerBrand}>PROXAFRICA · SOLUTION GROUND</Text>

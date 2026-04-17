@@ -28,7 +28,7 @@ export default function PlatformSection() {
       {/* Bottom CTA area */}
       <View style={styles.ctaBanner}>
         <Text style={styles.ctaBannerLabel}>Currently live at</Text>
-        <Text style={styles.ctaBannerValue}>University of Nigeria, Nsukka</Text>
+        <Text style={styles.ctaBannerValue}>Nnamdi Azikiwe Univercity</Text>
         <View style={styles.liveDot}>
           <View style={styles.liveInner} />
           <Text style={styles.liveText}>LIVE</Text>

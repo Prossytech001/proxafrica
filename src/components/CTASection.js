@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Linking } from 'react-native';
 import { colors, spacing, radius } from '../theme';
 
+
 export default function CTASection() {
   return (
     <View style={styles.wrap}>
@@ -19,9 +20,9 @@ export default function CTASection() {
             onPress={() => Linking.openURL('mailto:hello@proxafrica.com')}
             activeOpacity={0.8}
           >
-            <Text style={styles.btnPrimaryText}>Start a Project ↗</Text>
+            <Text style={styles.btnPrimaryText} onPress={() => Linking.openURL('https://chat.whatsapp.com/I45oBV5XfS1CSZ76Z8PX3J?mode=gi_t')}>Start a Project ↗</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.btnGhost} activeOpacity={0.8}>
+          <TouchableOpacity style={styles.btnGhost} activeOpacity={0.8} onPress={() => Linking.openURL('https://chat.whatsapp.com/I45oBV5XfS1CSZ76Z8PX3J?mode=gi_t')}>
             <Text style={styles.btnGhostText}>Join Training</Text>
           </TouchableOpacity>
         </View>

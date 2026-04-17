@@ -9,6 +9,7 @@ import {
   Platform,
 } from 'react-native';
 import { colors, spacing } from '../theme';
+import { Linking } from 'react-native';
 
 const { height: H, width: W } = Dimensions.get('window');
 
@@ -75,9 +76,10 @@ export default function HeroSection({ onCta }) {
         <TouchableOpacity style={styles.btnPrimary} onPress={onCta} activeOpacity={0.8}>
           <Text style={styles.btnPrimaryText}>Explore Services →</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btnGhost} activeOpacity={0.8}>
-          <Text style={styles.btnGhostText}>Our Platform</Text>
+        <TouchableOpacity style={styles.btnGhost} activeOpacity={0.8} onPress={() => Linking.openURL('https://wa.me/message/BFK5N4OMHUXXG1')}>
+          <Text style={styles.btnGhostText}>Get In Touch ↗</Text>
         </TouchableOpacity>
+            
       </Animated.View>
 
       {/* Scroll hint */}
