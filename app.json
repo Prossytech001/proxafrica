@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "ProxAfrica",
+    "slug": "proxafrica",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "platforms": ["ios", "android", "web"],
+    "web": {
+      "bundler": "metro",
+      "output": "single"
+    }
+  }
+}
