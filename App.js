@@ -73,13 +73,13 @@ export default function App() {
           <AboutSection />
         </View>
 
-        <View ref={educationRef} collapsable={false}>
+        
           <StickyCardStack
             label="// Tech Education"
             title={'We Train the\nNext Generation'}
             cards={education}
           />
-        </View>
+        
 
         <View ref={platformRef} collapsable={false}>
           <PlatformSection />

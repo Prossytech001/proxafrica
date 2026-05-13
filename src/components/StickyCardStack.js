@@ -2,240 +2,385 @@ import React, { useRef } from 'react';
 import {
   View,
   Text,
-  ScrollView,
-  StyleSheet,
   Animated,
+  StyleSheet,
   Dimensions,
-  Platform,
 } from 'react-native';
+
 import { colors, radius, spacing } from '../theme';
 
-const { height: SCREEN_H, width: SCREEN_W } = Dimensions.get('window');
-const CARD_HEIGHT = Math.min(SCREEN_H * 0.72, 520);
-const CARD_OFFSET = 24; // how much each stacked card peeks
+const { height: SCREEN_H } = Dimensions.get('window');
 
-/**
- * StickyCardStack
- * Props:
- *   title: string
- *   label: string
- *   cards: Array<{ id, title, desc, accent, icon, tags? }>
- *   renderCard: (card, index) => ReactNode  (optional override)
- */
-export default function StickyCardStack({ title, label, cards }) {
+const CARD_HEIGHT = Math.min(SCREEN_H * 0.52, 420);
+
+export default function StickyCardStack({
+  title,
+  label,
+  cards,
+  beforeContent,
+  afterContent,
+}) {
   const scrollY = useRef(new Animated.Value(0)).current;
 
   return (
-    <View style={styles.wrapper}>
-      {/* Section Header — scrolls away normally */}
+    <Animated.ScrollView
+      showsVerticalScrollIndicator={false}
+      scrollEventThrottle={16}
+      style={styles.container}
+      contentContainerStyle={styles.content}
+      onScroll={Animated.event(
+        [
+          {
+            nativeEvent: {
+              contentOffset: {
+                y: scrollY,
+              },
+            },
+          },
+        ],
+        {
+          useNativeDriver: true,
+        }
+      )}
+    >
+      {/* BEFORE SECTION */}
+      {beforeContent}
+
+      {/* HEADER */}
       <View style={styles.header}>
         <Text style={styles.label}>{label}</Text>
-        <Text style={styles.title}>{title}</Text>
+
+        <Text style={styles.title}>
+          {title}
+        </Text>
+
+        <Text style={styles.subtitle}>
+          Smooth mobile-first rolling cards layout
+        </Text>
       </View>
 
-      {/* Scroll area: card height * count gives the total scroll length */}
-      <Animated.ScrollView
-        onScroll={Animated.event(
-          [{ nativeEvent: { contentOffset: { y: scrollY } } }],
-          { useNativeDriver: true }
-        )}
-        scrollEventThrottle={16}
-        showsVerticalScrollIndicator={false}
-        style={styles.scrollArea}
-        contentContainerStyle={{ paddingBottom: CARD_HEIGHT * 0.3 }}
-      >
-        {/* Spacer so first card starts visible */}
-        <View style={{ height: 20 }} />
-
+      {/* CARDS */}
+      <View style={styles.cardsContainer}>
         {cards.map((card, index) => {
-          // Each card sticks when it reaches the top
-          // translateY: once card scrolled to sticking point → stays, pushes by next card
-          const cardScrollStart = index * (CARD_HEIGHT - CARD_OFFSET * (cards.length - index));
+          const inputRange = [
+            index * 220,
+            (index + 1) * 220,
+          ];
 
           const translateY = scrollY.interpolate({
-            inputRange: [
-              Math.max(0, cardScrollStart - CARD_HEIGHT),
-              cardScrollStart,
-              cardScrollStart + CARD_HEIGHT,
-            ],
-            outputRange: [CARD_HEIGHT * 0.15, 0, 0],
+            inputRange,
+            outputRange: [80, 0],
             extrapolate: 'clamp',
           });
 
           const scale = scrollY.interpolate({
-            inputRange: [
-              cardScrollStart,
-              cardScrollStart + CARD_HEIGHT,
-            ],
-            outputRange: [1, 0.94],
+            inputRange,
+            outputRange: [0.94, 1],
             extrapolate: 'clamp',
           });
 
           const opacity = scrollY.interpolate({
-            inputRange: [
-              cardScrollStart + CARD_HEIGHT * 0.6,
-              cardScrollStart + CARD_HEIGHT,
-            ],
-            outputRange: [1, 0.4],
+            inputRange,
+            outputRange: [0.4, 1],
             extrapolate: 'clamp',
           });
 
           return (
             <Animated.View
-              key={card.id}
+              key={card.id ?? index}
               style={[
-                styles.cardWrap,
+                styles.columnCard,
                 {
-                  transform: [{ translateY }, { scale }],
+                  transform: [
+                    { translateY },
+                    { scale },
+                  ],
                   opacity,
-                  zIndex: index + 1,
-                  top: CARD_OFFSET * index,
-                  // On web, use position sticky feel via marginTop
-                  marginBottom: index < cards.length - 1 ? -CARD_HEIGHT * 0.55 : 0,
                 },
               ]}
             >
-              <CardBody card={card} index={index} />
+              <CardBody
+                card={card}
+                index={index}
+              />
             </Animated.View>
           );
         })}
-      </Animated.ScrollView>
-    </View>
+      </View>
+
+      {/* AFTER SECTION */}
+      {afterContent}
+    </Animated.ScrollView>
   );
 }
 
 function CardBody({ card, index }) {
-  const accentColor = card.accent || card.color || colors.primary;
+  const accent = card.accent || colors.primary;
 
   return (
-    <View style={[styles.card, { borderTopColor: accentColor }]}>
-      {/* Top row */}
+    <View
+      style={[
+        styles.card,
+        {
+          borderColor: accent + '33',
+          backgroundColor: accent + '10',
+        },
+      ]}
+    >
+      {/* TOP */}
       <View style={styles.cardTop}>
-        <Text style={[styles.cardNum, { color: accentColor }]}>{card.id || String(index + 1).padStart(2, '0')}</Text>
-        {card.icon ? <Text style={styles.cardIcon}>{card.icon}</Text> : null}
+        <Text
+          style={[
+            styles.cardNumber,
+            { color: accent },
+          ]}
+        >
+          {card.id ||
+            String(index + 1).padStart(2, '0')}
+        </Text>
+
+        {card.icon ? (
+          <Text style={styles.cardIcon}>
+            {card.icon}
+          </Text>
+        ) : null}
       </View>
 
-      {/* Title */}
-      <Text style={styles.cardTitle}>{card.title}</Text>
+      {/* BADGE */}
+      <View
+        style={[
+          styles.badge,
+          {
+            backgroundColor: accent + '15',
+            borderColor: accent + '30',
+          },
+        ]}
+      >
+        <Text
+          style={[
+            styles.badgeText,
+            { color: accent },
+          ]}
+        >
+          {card.role || 'FEATURE'}
+        </Text>
+      </View>
 
-      {/* Desc */}
-      <Text style={styles.cardDesc}>{card.desc}</Text>
+      {/* TITLE */}
+      <Text style={styles.cardTitle}>
+        {card.title}
+      </Text>
 
-      {/* Tags */}
-      {card.tags && (
-        <View style={styles.tagsRow}>
-          {card.tags.map(t => (
-            <View key={t} style={[styles.tag, { borderColor: accentColor + '40' }]}>
-              <Text style={[styles.tagText, { color: accentColor }]}>{t}</Text>
+      {/* DESC */}
+      <Text style={styles.cardDesc}>
+        {card.desc}
+      </Text>
+
+      {/* BULLETS */}
+      {card.bullets && (
+        <View style={styles.bulletsWrap}>
+          {card.bullets.map((bullet, i) => (
+            <View
+              key={i}
+              style={styles.bulletRow}
+            >
+              <View
+                style={[
+                  styles.bulletDot,
+                  {
+                    backgroundColor: accent,
+                  },
+                ]}
+              />
+
+              <Text style={styles.bulletText}>
+                {bullet}
+              </Text>
             </View>
           ))}
         </View>
       )}
 
-      {/* Bottom accent line */}
-      <View style={[styles.bottomLine, { backgroundColor: accentColor }]} />
+      {/* TAGS */}
+      {card.tags && (
+        <View style={styles.tagsRow}>
+          {card.tags.map((tag) => (
+            <View
+              key={tag}
+              style={[
+                styles.tag,
+                {
+                  borderColor: accent + '40',
+                },
+              ]}
+            >
+              <Text
+                style={[
+                  styles.tagText,
+                  {
+                    color: accent,
+                  },
+                ]}
+              >
+                {tag}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    minHeight: SCREEN_H,
-    paddingHorizontal: spacing.md,
+  container: {
+    flex: 1,
+    backgroundColor:
+      colors.background || '#0d0d0d',
   },
+
+  content: {
+    paddingBottom: 100,
+  },
+
   header: {
-    paddingTop: spacing.xxl,
-    paddingBottom: spacing.lg,
+    paddingTop: 80,
+    paddingHorizontal: spacing.lg,
+    paddingBottom: 30,
   },
+
   label: {
-    fontFamily: 'Courier New',
     fontSize: 11,
-    letterSpacing: 3,
+    letterSpacing: 4,
     textTransform: 'uppercase',
     color: colors.primary,
-    marginBottom: spacing.sm,
+    marginBottom: 10,
+    fontFamily: 'Courier New',
   },
+
   title: {
-    fontFamily: 'Georgia',
-    fontSize: 36,
-    fontWeight: '700',
-    color: colors.white,
+    fontSize: 34,
     lineHeight: 42,
+    color: colors.white,
+    fontWeight: '700',
+    fontFamily: 'Georgia',
   },
-  scrollArea: {
-    flex: 1,
+
+  subtitle: {
+    marginTop: 12,
+    fontSize: 15,
+    lineHeight: 24,
+    color: colors.grey2,
   },
-  cardWrap: {
-    position: 'relative',
+
+  cardsContainer: {
+    paddingHorizontal: 16,
+    gap: 22,
+  },
+
+  columnCard: {
     width: '100%',
   },
+
   card: {
-    backgroundColor: colors.surfaceRaised,
-    borderRadius: radius.lg,
-    borderTopWidth: 2,
-    borderTopColor: colors.primary,
-    padding: spacing.lg,
-    height: CARD_HEIGHT,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.5,
-    shadowRadius: 40,
-    elevation: 20,
+    minHeight: CARD_HEIGHT,
+    borderWidth: 1,
+    borderRadius: radius.xl || 28,
+    padding: 24,
     overflow: 'hidden',
     justifyContent: 'space-between',
   },
+
   cardTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cardNum: {
-    fontFamily: 'Courier New',
-    fontSize: 12,
+
+  cardNumber: {
+    fontSize: 11,
     letterSpacing: 3,
-    color: colors.primary,
+    fontFamily: 'Courier New',
   },
+
   cardIcon: {
-    fontSize: 36,
+    fontSize: 34,
   },
+
+  badge: {
+    alignSelf: 'flex-start',
+    marginTop: 18,
+    borderRadius: 999,
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+
+  badgeText: {
+    fontSize: 10,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    fontFamily: 'Courier New',
+  },
+
   cardTitle: {
-    fontFamily: 'Georgia',
+    marginTop: 20,
     fontSize: 28,
-    fontWeight: '700',
-    color: colors.white,
     lineHeight: 34,
-    marginTop: spacing.md,
+    color: colors.white,
+    fontWeight: '700',
+    fontFamily: 'Georgia',
   },
+
   cardDesc: {
+    marginTop: 14,
     fontSize: 15,
-    lineHeight: 24,
+    lineHeight: 25,
     color: colors.grey2,
-    marginTop: spacing.sm,
-    flex: 1,
   },
+
+  bulletsWrap: {
+    marginTop: 24,
+    gap: 12,
+  },
+
+  bulletRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+
+  bulletDot: {
+    width: 6,
+    height: 6,
+    borderRadius: 999,
+    marginTop: 8,
+    marginRight: 10,
+  },
+
+  bulletText: {
+    flex: 1,
+    fontSize: 13,
+    lineHeight: 22,
+    color: colors.grey2,
+  },
+
   tagsRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 8,
-    marginTop: spacing.md,
+    gap: 10,
+    marginTop: 24,
   },
+
   tag: {
     borderWidth: 1,
-    borderRadius: radius.sm,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
   },
+
   tagText: {
-    fontFamily: 'Courier New',
-    fontSize: 10,
+    fontSize: 11,
     letterSpacing: 1,
-  },
-  bottomLine: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: 1,
-    opacity: 0.2,
+    fontFamily: 'Courier New',
   },
 });
