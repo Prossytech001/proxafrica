@@ -123,7 +123,7 @@ function CardBody({ card, index }) {
         styles.card,
         {
           borderColor: accent + '33',
-          backgroundColor: accent + '10',
+          backgroundColor: accent + '40',
         },
       ]}
     >
@@ -236,7 +236,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor:
-      colors.background || '#0d0d0d',
+      colors.background ,
   },
 
   content: {
